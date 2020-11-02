@@ -58,10 +58,17 @@ def genModifications(word: str):
   for number in range(9):
     result.append(word + str(number))
     result.append(str(number) + word)
-  for symbol in "!@#$%^&*()":
+  # for symbol in "~`!@#$%^&*()_-+={[}]|<,>.?/":
+  for symbol in "1!":
     result.append(word + symbol)
     result.append(symbol + word)
-  print(result)
+
+  result.append(word.translate(str.maketrans('eEsSaAoObBtTiI', '33$$@@00887711')))
+  result.append(word.translate(str.maketrans('eEsSaAoObBtTiI', '33$$@@008877!!')))
+  result.append(word.translate(str.maketrans('aAoO', '@@00')))
+  result.append(word.translate(str.maketrans('eE', '33')))
+  result.append(word.translate(str.maketrans('sS', '$$')))
+  # print(result)
   return result
 
 if __name__ == "__main__":
