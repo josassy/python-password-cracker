@@ -4,7 +4,7 @@ with open("bible.txt", 'r') as bible:
   word_list = {}
   for line in bible:
     for word in line.split(' '):
-      word = word.translate(str.maketrans('', '', string.punctuation)).strip('\n[]()').lower()
+      word = word.translate(str.maketrans('', '', string.punctuation)).strip('\n[]()')
       if word and not word.isnumeric() and word not in word_list:
         word_list[word] = True
 
