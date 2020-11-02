@@ -1,4 +1,5 @@
 import hashlib
+from itertools import combinations 
 
 def main():
   # add all words to python dict
@@ -53,22 +54,33 @@ def crackPassword(hashes: dict, salt: str, dictionary: dict) -> dict:
         crackedPasswords[hashes[hashedWord]] = word
   return crackedPasswords     
 
-def genModifications(word: str):
-  result = [word.lower(), word.upper(), word.title()]
+def genModifications(word: str) -> dict:
+  result = {word.lower(), word.upper(), word.title()}
   for number in range(9):
-    result.append(word + str(number))
-    result.append(str(number) + word)
+    result.add(word + str(number))
+    result.add(str(number) + word)
   # for symbol in "~`!@#$%^&*()_-+={[}]|<,>.?/":
-  for symbol in "1!":
-    result.append(word + symbol)
-    result.append(symbol + word)
+  for symbol in "!":
+    result.add(word + symbol)
+    result.add(symbol + word)
+  subs = {
+    'e': 'E',
+    's': '$',
+    'a': '@',
+    'o': '0',
+    'b': '8',
+    't': '7',
+    'i': '!'
+  }
 
-  result.append(word.translate(str.maketrans('eEsSaAoObBtTiI', '33$$@@00887711')))
-  result.append(word.translate(str.maketrans('eEsSaAoObBtTiI', '33$$@@008877!!')))
-  result.append(word.translate(str.maketrans('aAoO', '@@00')))
-  result.append(word.translate(str.maketrans('eE', '33')))
-  result.append(word.translate(str.maketrans('sS', '$$')))
-  # print(result)
+  comb = combinations(subs, 2) 
+  for variant in {word.lower(), word.upper(), word.title()}:
+    result.add(variant.translate(str.maketrans('eEsSaAoObBtTiI', '33$$@@008877!!')))
+    result.add(variant.translate(str.maketrans('aAoO', '@@00')))
+    for key in subs:
+      result.add(variant.translate(str.maketrans(key + key.upper(), subs[key]*2)))
+    for left, right in combinations(subs, 2):
+      result.add(variant.translate(str.maketrans(left + left.upper() + right + right.upper(), subs[left]*2 + subs[right]*2)))
   return result
 
 if __name__ == "__main__":
