@@ -33,6 +33,14 @@ def main():
       passwords = crackPassword(saltDict[salt], salt, dictionary)
   # crackedPasswords = crackPassword(noSaltHashes, '', dictionary)
 
+  # Read in existing passwords from file (in case we missed some from previously)
+  with open('passwords.txt', 'r') as existingPasswords:
+    for line in existingPasswords:
+      line = line.strip('\n').split(':')
+      [userName, password] = line
+      passwords[userName] = password
+
+  # Write passwords back to file
   with open('passwords.txt', 'w') as outfile:
     for name in sorted(passwords.keys()):
       outfile.write(f'{name}:{passwords[name]}\n')
@@ -43,6 +51,7 @@ def crackPassword(hashes: dict, salt: str, dictionary: dict) -> dict:
   crackedPasswords = {}
   for dictWord in dictionary:
     dictWord = dictWord.strip('\n')
+    # print(f"trying word {dictWord}")
     wordsToTry = genModifications(dictWord)
     for word in wordsToTry:
       word = word + salt
@@ -56,13 +65,27 @@ def crackPassword(hashes: dict, salt: str, dictionary: dict) -> dict:
 
 def genModifications(word: str) -> dict:
   result = {word.lower(), word.upper(), word.title()}
-  for number in range(9):
-    result.add(word + str(number))
-    result.add(str(number) + word)
-  # for symbol in "~`!@#$%^&*()_-+={[}]|<,>.?/":
-  for symbol in "!":
-    result.add(word + symbol)
-    result.add(symbol + word)
+  # for index in range(len(word)):
+  #   result.add(word[:index] + word[index].upper() + word[index+1:])
+  # print(result)
+  wordVariants = result.copy()
+  for wordVariant in wordVariants:
+    for number in range(999):
+      # result.add(wordVariant + '!' + str(number))
+      # result.add('!' + wordVariant + str(number))
+      result.add(wordVariant + str(number))
+      # result.add(wordVariant + str(number) + '!')
+      # result.add(str(number) + wordVariant + '!')
+      # result.add(str(number) + word + str(number))
+      result.add(str(number) + wordVariant)
+  
+  # numberVariants = result.copy()
+  # for numVariant in numberVariants:
+  #   # for symbol in "~`!@#$%^&*()_-+={[}]|<,>.?/":
+  #   for symbol in "!@#$%":
+  #     result.add(numVariant + symbol)
+  #     result.add(symbol + numVariant)
+  
   subs = {
     'e': 'E',
     's': '$',
@@ -73,14 +96,15 @@ def genModifications(word: str) -> dict:
     'i': '!'
   }
 
-  comb = combinations(subs, 2) 
-  for variant in {word.lower(), word.upper(), word.title()}:
-    result.add(variant.translate(str.maketrans('eEsSaAoObBtTiI', '33$$@@008877!!')))
-    result.add(variant.translate(str.maketrans('aAoO', '@@00')))
-    for key in subs:
-      result.add(variant.translate(str.maketrans(key + key.upper(), subs[key]*2)))
-    for left, right in combinations(subs, 2):
-      result.add(variant.translate(str.maketrans(left + left.upper() + right + right.upper(), subs[left]*2 + subs[right]*2)))
+  # comb = combinations(subs, 2)
+  # capVariants = result.copy()
+  # for variant in capVariants:
+  #   result.add(variant.translate(str.maketrans('eEsSaAoObBtTiI', '33$$@@008877!!')))
+  #   result.add(variant.translate(str.maketrans('aAoO', '@@00')))
+  #   for key in subs:
+  #     result.add(variant.translate(str.maketrans(key + key.upper(), subs[key]*2)))
+  #   for left, right in combinations(subs, 2):
+  #     result.add(variant.translate(str.maketrans(left + left.upper() + right + right.upper(), subs[left]*2 + subs[right]*2)))
   return result
 
 if __name__ == "__main__":

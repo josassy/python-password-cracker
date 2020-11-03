@@ -5,3 +5,11 @@ append/prepend random letters/symbols/numbers
 permutations of capitalizing each letter
 common letter/number substitutions
 above two combined for each letter permutation
+
+they might change case, prepend and/or append additional letters, numbers, or symbols, and/or make common letter/symbol or letter/number substitutions. 
+
+possible:
+* change case
+* prepend lns
+* append lns
+* prepend and append lns
