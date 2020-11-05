@@ -1,0 +1,3 @@
+performance stats:
+500,000k+ hashes per second
+total hashes = 13715 words x 100 variants per word x 6 salts x ~100 iterations = >822,900,000 total hashes performed

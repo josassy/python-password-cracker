@@ -1,5 +1,6 @@
 import hashlib
 from itertools import combinations 
+import time
 
 def main():
   # add all words to python dict
@@ -31,8 +32,12 @@ def main():
       passwords.update(crackPassword(saltDict[salt], salt, dictionary))
     else:
       passwords = crackPassword(saltDict[salt], salt, dictionary)
-  # crackedPasswords = crackPassword(noSaltHashes, '', dictionary)
+  # passwords = crackPassword(noSaltHashes, '', dictionary)
 
+  # print found passwords
+  for name in sorted(passwords.keys()):
+      print(f'{name}:{passwords[name]}')
+  
   # Read in existing passwords from file (in case we missed some from previously)
   with open('passwords.txt', 'r') as existingPasswords:
     for line in existingPasswords:
@@ -53,6 +58,9 @@ def crackPassword(hashes: dict, salt: str, dictionary: dict) -> dict:
     dictWord = dictWord.strip('\n')
     # print(f"trying word {dictWord}")
     wordsToTry = genModifications(dictWord)
+    # print(wordsToTry)
+    print(f'{len(wordsToTry)} words to try')
+    a = time.perf_counter()
     for word in wordsToTry:
       word = word + salt
       hashedWord = hashlib.md5(word.encode()).hexdigest()
@@ -61,6 +69,8 @@ def crackPassword(hashes: dict, salt: str, dictionary: dict) -> dict:
         print(f"match: {word} -> {hashedWord} ({hashes[hashedWord]})")
         matches = matches + 1
         crackedPasswords[hashes[hashedWord]] = word
+    b = time.perf_counter()
+    print(f'{len(wordsToTry)/(b - a)} hashes per sec')
   return crackedPasswords     
 
 def genModifications(word: str) -> dict:
@@ -70,21 +80,21 @@ def genModifications(word: str) -> dict:
   # print(result)
   wordVariants = result.copy()
   for wordVariant in wordVariants:
-    for number in range(999):
+    for number in range(9):
       # result.add(wordVariant + '!' + str(number))
-      # result.add('!' + wordVariant + str(number))
       result.add(wordVariant + str(number))
-      # result.add(wordVariant + str(number) + '!')
-      # result.add(str(number) + wordVariant + '!')
-      # result.add(str(number) + word + str(number))
       result.add(str(number) + wordVariant)
+      # result.add(wordVariant + str(number) + '!')
+      # result.add(wordVariant + str(number) *2 + '!')
+      # result.add(str(number) + wordVariant + '!')
+      # result.add(str(number) + wordVariant + str(number))
   
-  # numberVariants = result.copy()
-  # for numVariant in numberVariants:
-  #   # for symbol in "~`!@#$%^&*()_-+={[}]|<,>.?/":
-  #   for symbol in "!@#$%":
-  #     result.add(numVariant + symbol)
-  #     result.add(symbol + numVariant)
+  numberVariants = result.copy()
+  for numVariant in numberVariants:
+    # for symbol in "~`!@#$%^&*()_-+={[}]|<,>.?/":
+    for symbol in "!@#$%":
+      result.add(numVariant + symbol)
+      result.add(symbol + numVariant)
   
   subs = {
     'e': 'E',
@@ -96,15 +106,16 @@ def genModifications(word: str) -> dict:
     'i': '!'
   }
 
-  # comb = combinations(subs, 2)
-  # capVariants = result.copy()
-  # for variant in capVariants:
-  #   result.add(variant.translate(str.maketrans('eEsSaAoObBtTiI', '33$$@@008877!!')))
-  #   result.add(variant.translate(str.maketrans('aAoO', '@@00')))
-  #   for key in subs:
-  #     result.add(variant.translate(str.maketrans(key + key.upper(), subs[key]*2)))
-  #   for left, right in combinations(subs, 2):
-  #     result.add(variant.translate(str.maketrans(left + left.upper() + right + right.upper(), subs[left]*2 + subs[right]*2)))
+  comb = combinations(subs, 2)
+  capVariants = result.copy()
+  for variant in capVariants:
+    result.add(variant.translate(str.maketrans('eEsSaAoObBtTiI', '33$$@@008877!!')))
+    # result.add(variant.translate(str.maketrans('aAoO', '@@00')))
+    for key in subs:
+      result.add(variant.translate(str.maketrans(key + key.upper(), subs[key]*2)))
+    for left, right in combinations(subs, 2):
+      result.add(variant.translate(str.maketrans(left + left.upper() + right + right.upper(), subs[left]*2 + subs[right]*2)))
+  # print(result)
   return result
 
 if __name__ == "__main__":

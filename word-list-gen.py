@@ -13,3 +13,4 @@ with open("wordlist.txt", "w") as output:
     output.write(word)
     output.write('\n')
 
+
